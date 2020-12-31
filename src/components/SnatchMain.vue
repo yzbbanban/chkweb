@@ -34,8 +34,9 @@
       </el-col>
       <el-col :span="12">
           <h1>私有奖池</h1>
-          <span class="more" @click="moreGames">more</span>
-          <br>
+          <div class="opera">
+            <el-button class="more" type="text" @click="moreGames">more</el-button>
+          </div>
           <el-col class="ef" :span="10" v-for="(item) in priList" :key="item">
             <div style="cursor:pointer" @click="privateGame(item)">
               <div>抢夺总数量:{{item.am}}</div>
@@ -46,6 +47,7 @@
           </el-col>
       </el-col>
     </el-row>
+    
   </div>
 </template>
 
@@ -54,7 +56,6 @@ export default {
   name: 'SnatchMain',
   data () {
     return {
-      currentAmount:0,
       infoForm:{amount:10},
       priList:[
         {_id:1,am:"21",amount:"56",count:"54",time:"20:01"},
@@ -78,16 +79,14 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.opera{
+  height: 60px;
+}
 .more{
   color: blueviolet;
-  float:left;
-  margin-left:10px;
-  cursor:pointer;
+  float: right;;
+  cursor:pointer; 
 }
-.el-textarea__inner,.el-input__inner{
-  background: transparent;
-}
-
 .h1{
   text-align: center;
 }
@@ -99,9 +98,7 @@ export default {
   padding:10px;
   margin: 12px;
 }
-.el-textarea__inner,.el-input__inner{
-  background: transparent;
-}
+
 .el-card {
   text-align: center;
   color: white;

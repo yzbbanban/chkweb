@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="title">私人详情</div>
     <el-container>
         <el-main>
+          <div class="title">私人详情</div>
           <el-card class="box-card">
             <h1>ID: 100</h1>
             <el-form class="elform" :model="poolForm" ref="poolForm" label-position="left" label-width="100px">

@@ -4,6 +4,7 @@ import MainPage from '@/components/MainPage'
 import GameDetail from '@/components/GameDetail'
 import Games from '@/components/Games'
 import MyNft from '@/components/MyNft'
+import NftShop from '@/components/NftShop'
 
 Vue.use(Router)
 
@@ -29,5 +30,10 @@ export default new Router({
       name: 'MyNft',
       component: MyNft
     },
+    {
+      path: '/nftShop',
+      name: 'NftShop',
+      component: NftShop
+    }
   ]
 })

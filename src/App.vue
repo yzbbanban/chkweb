@@ -2,14 +2,35 @@
   <div class="main-bac">
     <el-container>
       <el-header>
-        <el-link :underline="false" type="info" href="#/">
+        <div style="float:left">
+          <el-link :underline="false" type="info" href="#/">
+            <el-avatar :src='url'></el-avatar>
+            <span class="sp-text">MySord</span>
+          </el-link>
+        </div>
+        <div style="margin-left:120px;float:left">
+            <el-tabs v-model="activeName" tab-positi="bottom"	 @tab-click="handleClick">
+              <el-tab-pane label="Private Snatch" name="Snatchs"></el-tab-pane>
+              <el-tab-pane label="MyNft" name="MyNft"></el-tab-pane>
+              <el-tab-pane label="NftShop" name="NftShop"></el-tab-pane>
+            </el-tabs>
+        </div>
+        <div style="float:right">
+          <span class="address"><i class="el-icon-s-opportunity">  {{address}}</i></span>
+        </div>
+
+        <!-- 
+          <el-link :underline="false" type="info" href="#/">
           <el-avatar :src='url'></el-avatar>
           <span class="sp-text">MySord</span>
         </el-link>
         <el-link class="el-m" :underline="false" type="info" href="#/myNft">
           <span class="sp-text">MyNft</span>
         </el-link>
-        <span class="address"><i class="el-icon-s-opportunity">  {{address}}</i></span>
+        <el-link class="el-m" :underline="false" type="info" href="#/nftShop">
+          <span class="sp-text">NftShop</span>
+        </el-link>
+        <span class="address"><i class="el-icon-s-opportunity">  {{address}}</i></span> -->
       </el-header>
       <router-view/>
       <el-footer>
@@ -33,6 +54,18 @@ export default {
       url: require("../src/assets/av.jpg"),
       address:"0x10E98765aE49E72Dd11b04a9c0981D79f05BE003",
     }
+  },
+  methods:{
+    handleClick(item){
+      console.log(item.name)
+      if(item.name=="NftShop"){
+        this.$router.push({path:"nftShop"})
+      }else if(item.name=="MyNft"){
+        this.$router.push({ path: 'myNft'})
+      }else if(item.name=="Snatchs"){
+        this.$router.push({ path: 'Games'})
+      }
+    },
   }
 }
 </script>
@@ -56,28 +89,35 @@ export default {
 
 .el-header{
   background-color: black;
-  position: relative;
+  position: fixed;
   width: 100%;
+  top: 0;
+  left: 0;
+  bottom: 60px;
+  right: 0;
   height: 60px;
+  z-index: 100
 }
 .el-main {
-  position: absolute;
-  width: 80%;
-  margin-left: 10%;
+  width: 60%;
+  /* margin-left: 5%; */
   top: 60px;
   bottom: 60px;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
   color: rgb(206, 206, 206);
   text-align: left;
 }
 .el-footer{
-  position:absolute;
+  position:fixed;
   bottom:0;
+  left: 0;
+  right: 0;
   width:100%;
   height:30px;
   line-height:30px;
   text-align:center;
   background-color: #000;
+  z-index: 100
 }
 .footer-div{
   float:right;
@@ -89,10 +129,9 @@ export default {
 }
 .main-bac {
   margin: 0px;
-  padding: 0px;
-  height: 100%;
   min-height: 100vh;
+  margin: 60px 0;
   overflow-x: hidden;
-  background: url("../src/assets/bg-min.jpg") ;
+  background: url("../src/assets/bg-min.jpg") ; 
 }
 </style>
