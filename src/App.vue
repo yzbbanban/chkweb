@@ -63,7 +63,7 @@ export default {
       }else if(item.name=="MyNft"){
         this.$router.push({ path: 'myNft'})
       }else if(item.name=="Snatchs"){
-        this.$router.push({ path: 'Games'})
+        this.$router.push({ path: 'games'})
       }
     },
   }

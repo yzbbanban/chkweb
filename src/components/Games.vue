@@ -1,7 +1,7 @@
 <template>
   <div>
       <div style="height:30px">
-        <el-button class="ceate-button" type="text" @click="showDialog">create snatch</el-button>
+        <el-button class="create-button" type="text" @click="showDialog">create snatch</el-button>
       </div>
       <div class="box-container">
           <el-card class="box-card"  v-for="item in priList" :key="item._id">
@@ -17,21 +17,18 @@
       </div>
       <el-dialog custom-class="el-dia" title="Create Snatch" :visible.sync="dialogFormVisible">
       <el-form :model="form">
-        <el-form-item label="durationTime" :label-width="formLabelWidth">
+        <el-form-item label="End time" :label-width="formLabelWidth">
             <el-date-picker
               v-model="durationTime"
               type="datetime"
               placeholder="set end time">
             </el-date-picker>
         </el-form-item>
-        <el-form-item label="platformAddress" :label-width="formLabelWidth">
+        <el-form-item label="Platform address" :label-width="formLabelWidth">
           <el-input v-model="form.platformAddress" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="increaseRange" :label-width="formLabelWidth">
+        <el-form-item label="Increase range" :label-width="formLabelWidth">
           <el-input v-model="form.increaseRange" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="tokenId" :label-width="formLabelWidth">
-          <el-input v-model="form.tokenId" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -63,17 +60,17 @@ export default {
             {_id:3,am:"65",amount:"32",count:"12",time:"20:24"},
             {_id:4,am:"23",amount:"65",count:"56",time:"20:55"},
             {_id:5,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:5,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:5,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:5,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:5,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:5,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:5,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:5,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:5,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:5,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:5,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:6,am:"12",amount:"2",count:"6",time:"20:33"}]
+            {_id:6,am:"76",amount:"43",count:"3",time:"20:11"},
+            {_id:7,am:"76",amount:"43",count:"3",time:"20:11"},
+            {_id:8,am:"76",amount:"43",count:"3",time:"20:11"},
+            {_id:9,am:"76",amount:"43",count:"3",time:"20:11"},
+            {_id:10,am:"76",amount:"43",count:"3",time:"20:11"},
+            {_id:11,am:"76",amount:"43",count:"3",time:"20:11"},
+            {_id:12,am:"76",amount:"43",count:"3",time:"20:11"},
+            {_id:13,am:"76",amount:"43",count:"3",time:"20:11"},
+            {_id:14,am:"76",amount:"43",count:"3",time:"20:11"},
+            {_id:15,am:"76",amount:"43",count:"3",time:"20:11"},
+            {_id:16,am:"12",amount:"2",count:"6",time:"20:33"}]
         }
     },
     methods:{
@@ -88,13 +85,10 @@ export default {
 </script>
 
 <style scoped>
-.ceate-button{
-  float: right;
-  margin-right: 50px;
-}
-.title{
-  color: white;
-  margin-left: 50%;
+.create-button{
+  float: left;
+  font-size: 40px;
+  margin-left: 50px;
 }
 .box-card {
   width: 20%;
@@ -106,8 +100,8 @@ export default {
   display: flex;
   flex-wrap: wrap;
   /* justify-content: space-between; */
-  width: 80%;
-  margin-left: 20%;
+  width: 100%;
+  margin-left: 5%;
 }
 
 </style>

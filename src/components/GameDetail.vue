@@ -7,24 +7,24 @@
             <h1>ID: 100</h1>
             <el-form class="elform" :model="poolForm" ref="poolForm" label-position="left" label-width="100px">
               <el-form-item label="总奖池" prop="pool">
-                <span>111</span>
+                <span style="font-size:40px">12.33</span>
               </el-form-item>
               <el-form-item label="当前轮" prop="pool">
-                <span>11122</span>
+                <span>5</span>
               </el-form-item>
               <el-form-item label="当前参与人数" prop="pool">
-                <span>1112222</span>
+                <span>11</span>
               </el-form-item>
               <el-form-item label="参与总人数" prop="pool">
-                <span>1112222</span>
+                <span>32</span>
               </el-form-item>
               <el-form-item label="下一轮时间" prop="pool">
-                <span>1112222</span>
+                <span>20min</span>
               </el-form-item>
               <el-form-item label="此轮结束时间" prop="pool">
                 <span>2020-12-30 20:00</span>
               </el-form-item>
-              <el-button type="info">抢夺</el-button>
+              <el-button plain type="primary">抢夺</el-button>
             </el-form>
           </el-card>
         </el-main>

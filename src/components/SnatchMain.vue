@@ -8,27 +8,24 @@
             奖池：{{currentAmount}}
           </h1>
           <el-form :model="infoForm" status-icon ref="infoForm" label-width="150px" class="demo-infoForm">
-            <el-form-item label="抢夺总数量" prop="pass">
-              <span>{{infoForm.amount}}</span>
-            </el-form-item>
-            <el-form-item label="当前轮抢夺总数" prop="amount">
-              <span>{{infoForm.amount}}</span>
-            </el-form-item>
-           <el-form-item label="上一次赢取列表" prop="amount">
-              <span>{{infoForm.amount}}</span>            
-            </el-form-item>
-            <el-form-item label="所有赢取列表" prop="amount">
-              <span>{{infoForm.amount}}</span>
-            </el-form-item>
             <el-form-item label="当前总额" prop="amount">
-              <span>{{infoForm.amount}}</span>            
+              <span style="font-size:40px">{{infoForm.amount}}</span>            
             </el-form-item>
-            <el-form-item label="总流水" prop="amount">
-              <span>{{infoForm.amount}}</span>            
+            <el-form-item label="当前轮抢夺次数" prop="count">
+              <span>{{infoForm.count}}</span>
+            </el-form-item>
+            <el-form-item label="本次截止时间" prop="endTime">
+              <span>{{infoForm.endTime}}</span>            
+            </el-form-item>
+            <el-form-item label="抢夺总次数" prop="totalCount">
+              <span>{{infoForm.totalCount}}</span>
+            </el-form-item>
+             <el-form-item label="总流水" prop="totalAmount">
+              <span >{{infoForm.totalAmount}}</span>
             </el-form-item>
           </el-form>
           <div >
-            <el-button plain type="info">抢夺</el-button>
+            <el-button plain type="primary">抢夺</el-button>
           </div>
         </el-card>
       </el-col>
@@ -39,15 +36,24 @@
           </div>
           <el-col class="ef" :span="10" v-for="(item) in priList" :key="item">
             <div style="cursor:pointer" @click="privateGame(item)">
-              <div>抢夺总数量:{{item.am}}</div>
-              <div>奖池总额:{{item.amount}}</div>
+              <div>抢夺总数量:{{item.amount}}</div>
+              <div>奖池总额:{{item.totalAmount}}</div>
               <div>奖池轮数:{{item.count}}</div>
               <div>结束时间:{{item.time}}</div>
             </div>
           </el-col>
       </el-col>
     </el-row>
-    
+    <!-- <div>
+      <el-form :model="infoForm" status-icon ref="infoForm" label-width="150px" class="demo-infoForm">
+        <el-form-item label="上一次赢取列表" prop="last">
+          <span>{{infoForm.last}}</span>            
+        </el-form-item>
+        <el-form-item label="所有赢取列表" prop="winner">
+          <span>{{infoForm.winner}}</span>
+        </el-form-item>
+      </el-form>
+    </div> -->
   </div>
 </template>
 
@@ -56,14 +62,20 @@ export default {
   name: 'SnatchMain',
   data () {
     return {
-      infoForm:{amount:10},
+      infoForm:{
+        amount:20.454,
+        count:10,
+        totalCount:142,
+        endTime:"12min",
+        totalAmount:184242.3314,
+        },
       priList:[
-        {_id:1,am:"21",amount:"56",count:"54",time:"20:01"},
-        {_id:2,am:"54",amount:"43",count:"444",time:"20:52"},
-        {_id:3,am:"65",amount:"32",count:"12",time:"20:24"},
-        {_id:4,am:"23",amount:"65",count:"56",time:"20:55"},
-        {_id:5,am:"76",amount:"43",count:"3",time:"20:11"},
-        {_id:6,am:"12",amount:"2",count:"6",time:"20:33"}]
+        {_id:1,am:"21",amount:"56",totalAmount:"75.2",count:"54",time:"20:01"},
+        {_id:2,am:"54",amount:"43",totalAmount:"16.2",count:"444",time:"20:52"},
+        {_id:3,am:"65",amount:"32",totalAmount:"54.2",count:"12",time:"20:24"},
+        {_id:4,am:"23",amount:"65",totalAmount:"67.3",count:"56",time:"20:55"},
+        {_id:5,am:"76",amount:"43",totalAmount:"12.2",count:"3",time:"20:11"},
+        {_id:6,am:"12",amount:"2",totalAmount:"15",count:"6",time:"20:33"}]
     }
   },
   methods:{
@@ -89,6 +101,7 @@ export default {
 }
 .h1{
   text-align: center;
+  margin-bottom: 90px;
 }
 .ef{
   text-align: center;
