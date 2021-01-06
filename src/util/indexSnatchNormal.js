@@ -91,8 +91,9 @@ export const addSnatch = async(
 
 /**
  * snatch
- * @param {*} _id 推荐人id
- * @param {*} amount 推荐人id
+ * @param {address} account account
+ * @param {number} _id id
+ * @param {address} amount 推荐人id
  */
 export const snatchTokenPool = async(account,_id,amount) => {
     let collateral = await contract.snatchTokenPool(_id,amount).estimateGasAndCollateral({from:account});
@@ -102,15 +103,17 @@ export const snatchTokenPool = async(account,_id,amount) => {
 /**
  * 赢家收取收益
  * @param {address} account 执行人
+ * @param {number} _id id
  */
-export const withdrawPool = async(account) => {
-    let collateral = await contract.withdrawPool().estimateGasAndCollateral({from:account});
-    return await contract.withdrawPool().sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:300})
+export const withdrawPool = async(account,_id) => {
+    let collateral = await contract.withdrawPool(_id).estimateGasAndCollateral({from:account});
+    return await contract.withdrawPool(_id).sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:300})
 }
 
 /**
  * 其他人帮助赢家收取收益
  * @param {address} account 执行人
+ * @param {number} _id id
  */
 export const otherWithdrawToken = async(account,_id) => {
     let collateral = await contract.otherWithdrawToken(_id).estimateGasAndCollateral({from:account});

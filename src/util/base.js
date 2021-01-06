@@ -10,7 +10,6 @@ window.conflux.on('accountsChanged',async function (acc) {
     // console.log('=====>'+accounts[0])
     console.log('=====>'+acc)
   })
-console.log('----------')
 /**
  * 创建合约调用
  * @param {tokenAddress} tokenAddress 
@@ -26,6 +25,5 @@ export const getContract = (address, abi)=>{
  */
 export const getAddress = async()=>{
     let accounts = await conflux.enable();
-    console.log(accounts[0])
     return Promise.resolve(accounts[0]);
 }

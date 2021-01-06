@@ -5,11 +5,11 @@
         <div style="float:left">
           <el-link :underline="false" type="info" href="#/">
             <el-avatar :src='url'></el-avatar>
-            <span class="sp-text">MySord</span>
+            <span class="sp-text">Snatch</span>
           </el-link>
         </div>
         <div style="margin-left:120px;float:left">
-            <el-tabs v-model="activeName" tab-positi="bottom"	 @tab-click="handleClick">
+            <el-tabs tab-position="bottom" @tab-click="handleClick">
               <el-tab-pane label="Private Snatch" name="Snatchs"></el-tab-pane>
               <el-tab-pane label="MyNft" name="MyNft"></el-tab-pane>
               <el-tab-pane label="NftShop" name="NftShop"></el-tab-pane>
@@ -46,13 +46,22 @@
 </template>
 
 <script>
+import { getAddress } from "./util/base.js";
+
 export default {
   name: 'App',
+  created() {
+    getAddress().then(res=>{
+      this.address = res
+      localStorage.setItem('MyAccount', this.address);
+      //localStorage.removeItem('hou');
+    })
+  },
   data () {
     return {
       //http://mmuu.oss-cn-beijing.aliyuncs.com/123456.jpg
       url: require("../src/assets/av.jpg"),
-      address:"0x10E98765aE49E72Dd11b04a9c0981D79f05BE003",
+      address:"--",
     }
   },
   methods:{

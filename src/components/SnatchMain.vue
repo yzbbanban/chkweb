@@ -5,27 +5,36 @@
         <h1 class="h1">主奖池</h1>
         <el-card >
           <h1>
-            奖池：{{currentAmount}}
+            奖池：{{infoForm.amount}}
           </h1>
           <el-form :model="infoForm" status-icon ref="infoForm" label-width="150px" class="demo-infoForm">
-            <el-form-item label="当前总额" prop="amount">
-              <span style="font-size:40px">{{infoForm.amount}}</span>            
+            <el-form-item label="上一次出价" prop="lastAmount">
+              <span>{{infoForm.lastAmount}}</span>
             </el-form-item>
-            <el-form-item label="当前轮抢夺次数" prop="count">
-              <span>{{infoForm.count}}</span>
+            <el-form-item label="开奖时间" prop="durationTime">
+              <span>{{infoForm.durationTime}}</span>
             </el-form-item>
-            <el-form-item label="本次截止时间" prop="endTime">
-              <span>{{infoForm.endTime}}</span>            
+            <el-form-item label="当前轮抢夺次数" prop="snatchCount">
+              <span>{{infoForm.snatchCount}}</span>
             </el-form-item>
-            <el-form-item label="抢夺总次数" prop="totalCount">
-              <span>{{infoForm.totalCount}}</span>
+            <el-form-item label="当前抢夺者" prop="tempOwner">
+              <span>{{infoForm.tempOwner}}</span>
+            </el-form-item>
+            <el-form-item label="本轮开始时间" prop="startTime">
+              <span>{{infoForm.startTime}}</span>            
+            </el-form-item>
+            <el-form-item label="本轮截止时间" prop="durationEndTime">
+              <span>{{infoForm.durationEndTime}}</span>            
+            </el-form-item>
+            <el-form-item label="抢夺总次数" prop="totalSnatchCount">
+              <span>{{infoForm.totalSnatchCount}}</span>
             </el-form-item>
              <el-form-item label="总流水" prop="totalAmount">
               <span >{{infoForm.totalAmount}}</span>
             </el-form-item>
           </el-form>
           <div >
-            <el-button plain type="primary">抢夺</el-button>
+            <el-button plain type="primary" @click="snatch">抢夺</el-button>
           </div>
         </el-card>
       </el-col>
@@ -34,7 +43,7 @@
           <div class="opera">
             <el-button class="more" type="text" @click="moreGames">more</el-button>
           </div>
-          <el-col class="ef" :span="10" v-for="(item) in priList" :key="item">
+          <el-col class="ef" :span="10" v-for="(item) in priList" :key="item._id">
             <div style="cursor:pointer" @click="privateGame(item)">
               <div>抢夺总数量:{{item.amount}}</div>
               <div>奖池总额:{{item.totalAmount}}</div>
@@ -58,16 +67,47 @@
 </template>
 
 <script>
+import {initSnatchContract,getCurrentSnatchInfo,snatchPool} from "../util/indexSnatch.js";
+import {decimalToBalance,balanceToDecimal} from "../util/MathUtil.js";
+var moment = require('moment');
 export default {
   name: 'SnatchMain',
+  async created(){
+    await initSnatchContract()
+    console.log("==============")
+    let resultInfo = await getCurrentSnatchInfo()
+    let info = JSON.parse(JSON.stringify(resultInfo))
+    console.log(info)
+    this.infoForm.lastOwner = info[0]
+    this.infoForm.tempOwner = info[1]
+    this.infoForm.amount = balanceToDecimal(info[2])
+    this.infoForm.submitAmount = balanceToDecimal(info[3])
+    this.infoForm.lastAmount = balanceToDecimal(info[4])
+    this.infoForm.lastTime = info[5]
+    this.infoForm.startTime = moment.unix(info[6]).format("YYYY-MM-DD HH:mm")
+    this.infoForm.durationEndTime = moment.unix(parseInt(info[6])+(parseInt(info[7]))).format("YYYY-MM-DD HH:mm")
+    this.infoForm.durationTime = info[8]
+    this.infoForm.increaseRange = info[9]
+    this.infoForm.totalAmount = balanceToDecimal(info[10])
+    this.infoForm.snatchCount = info[11]
+    this.infoForm.totalSnatchCount = info[12]
+  },
   data () {
     return {
       infoForm:{
-        amount:20.454,
-        count:10,
-        totalCount:142,
-        endTime:"12min",
-        totalAmount:184242.3314,
+        lastOwner:"",
+        tempOwner:"",
+        amount:"",
+        submitAmount:"",
+        lastAmount:"",
+        lastTime:"",
+        startTime:"",
+        durationEndTime:"",
+        durationTime:"",
+        increaseRange:"",
+        totalAmount:"",
+        snatchCount:"",
+        totalSnatchCount:"",
         },
       priList:[
         {_id:1,am:"21",amount:"56",totalAmount:"75.2",count:"54",time:"20:01"},
@@ -84,6 +124,11 @@ export default {
     },
     privateGame(item){
       this.$router.push({ path: 'gameDetail', params: { gameId: item._id }})
+    },
+    async snatch(){
+      var account = localStorage.getItem('MyAccount');
+      let tx = await snatchPool(account,decimalToBalance(this.infoForm.lastAmount));
+      console.log(tx);
     }
   }
 }
