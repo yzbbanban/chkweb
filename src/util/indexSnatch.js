@@ -92,8 +92,8 @@ export const withdrawPool = async(account) => {
  * @param {address} account 执行人
  */
 export const otherWithdrawPool = async(account) => {
-    let collateral = await contract.otherWithdrawPool().estimateGasAndCollateral({from:account});
+    let collateral = await contract.otherWithdraw().estimateGasAndCollateral({from:account});
     console.log(collateral)
-    return await contract.otherWithdrawPool().sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
+    return await contract.otherWithdraw().sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
 }
 
