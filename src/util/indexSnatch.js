@@ -8,7 +8,7 @@ let contract
  */
 export const initSnatchContract = async()=>{
     if(contract == null){
-        contract = await getContract('0x857c8610b199faa95df978b502522ea59390da15',Snatch);
+        contract = await getContract('0x81d4f865df154c174ad83b2a5a9e1e288e666a8d',Snatch);
         console.log(contract)
     }
 }
@@ -83,7 +83,8 @@ export const snatchPool = async(account,value) => {
  */
 export const withdrawPool = async(account) => {
     let collateral = await contract.withdrawPool().estimateGasAndCollateral({from:account});
-    return await contract.withdrawPool().sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:300})
+    console.log(collateral)
+    return await contract.withdrawPool().sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
 }
 
 /**
@@ -92,6 +93,7 @@ export const withdrawPool = async(account) => {
  */
 export const otherWithdrawPool = async(account) => {
     let collateral = await contract.otherWithdrawPool().estimateGasAndCollateral({from:account});
-    return await contract.otherWithdrawPool().sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:300})
+    console.log(collateral)
+    return await contract.otherWithdrawPool().sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
 }
 

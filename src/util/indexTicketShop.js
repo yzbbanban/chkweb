@@ -73,20 +73,20 @@ export const buyTicket = async(account,value) => {
  * 销售票据
  * @param {address} account 执行人
  * @param {number} tokenId id
- * @param {address} price 购买价格
+ * @param {number} price 购买价格
  */
 export const sellTicket = async(account,tokenId,price) => {
-    let collateral = await contract.buyTicket(tokenId,price).estimateGasAndCollateral({from:account});
-    return await contract.buyTicket().sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
+    let collateral = await contract.sellTicker(tokenId,price).estimateGasAndCollateral({from:account});
+    return await contract.sellTicker(tokenId,price).sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
 }
 
 /**
  * 购买销售票据
  * @param {address} account 执行人
  * @param {number} tokenId id 
- * @param {address} value 购买价格
+ * @param {number} value 购买价格
  */
 export const buySellerTicket = async(account,tokenId,value) => {
-    let collateral = await contract.buySellerTicket(tokenId,price).estimateGasAndCollateral({from:account,value});
-    return await contract.buySellerTicket().sendTransaction({from:account,value,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
+    let collateral = await contract.buySellerTicket(tokenId).estimateGasAndCollateral({from:account,value});
+    return await contract.buySellerTicket(tokenId).sendTransaction({from:account,value,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
 }

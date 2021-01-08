@@ -11,8 +11,11 @@
             <el-form-item label="上一次出价" prop="lastAmount">
               <span>{{infoForm.lastAmount}}</span>
             </el-form-item>
-            <el-form-item label="开奖时间" prop="durationTime">
-              <span>{{infoForm.durationTime}}</span>
+            <el-form-item label="上一次出价时间" prop="lastTime">
+              <span>{{infoForm.lastTime}}</span>
+            </el-form-item>
+            <el-form-item label="开奖时间" prop="timer">
+              <span>{{infoForm.timer}}</span>
             </el-form-item>
             <el-form-item label="当前轮抢夺次数" prop="snatchCount">
               <span>{{infoForm.snatchCount}}</span>
@@ -34,7 +37,9 @@
             </el-form-item>
           </el-form>
           <div >
-            <el-button plain type="primary" @click="snatch">抢夺</el-button>
+            <el-button v-show="snatchBtn" plain type="primary" @click="snatch">抢夺</el-button>
+            <el-button v-show="withdrawPoolBtn" plain type="primary" @click="withdraw">领取收益</el-button>
+            <el-button v-show="otherWithdrawPoolBtn" plain type="primary" @click="otherWithdraw">帮助收取</el-button>
           </div>
         </el-card>
       </el-col>
@@ -67,23 +72,23 @@
 </template>
 
 <script>
-import {initSnatchContract,getCurrentSnatchInfo,snatchPool} from "../util/indexSnatch.js";
+import {initSnatchContract,getCurrentSnatchInfo,snatchPool,withdrawPool,otherWithdrawPool} from "../util/indexSnatch.js";
 import {decimalToBalance,balanceToDecimal} from "../util/MathUtil.js";
 var moment = require('moment');
 export default {
+  inject:['reload'],
   name: 'SnatchMain',
   async created(){
     await initSnatchContract()
     console.log("==============")
     let resultInfo = await getCurrentSnatchInfo()
     let info = JSON.parse(JSON.stringify(resultInfo))
-    console.log(info)
     this.infoForm.lastOwner = info[0]
     this.infoForm.tempOwner = info[1]
     this.infoForm.amount = balanceToDecimal(info[2])
     this.infoForm.submitAmount = balanceToDecimal(info[3])
     this.infoForm.lastAmount = balanceToDecimal(info[4])
-    this.infoForm.lastTime = info[5]
+    this.infoForm.lastTime =  moment.unix(info[5]).format("YYYY-MM-DD HH:mm")
     this.infoForm.startTime = moment.unix(info[6]).format("YYYY-MM-DD HH:mm")
     this.infoForm.durationEndTime = moment.unix(parseInt(info[6])+(parseInt(info[7]))).format("YYYY-MM-DD HH:mm")
     this.infoForm.durationTime = info[8]
@@ -91,9 +96,32 @@ export default {
     this.infoForm.totalAmount = balanceToDecimal(info[10])
     this.infoForm.snatchCount = info[11]
     this.infoForm.totalSnatchCount = info[12]
+    //结束，显示帮助其他人领取，自己领取
+    let showTime = info[8]-(moment().unix().valueOf()-info[5])
+    if(info[5]!=0 && showTime <= 0){
+      this.snatchBtn = false
+      let acc = localStorage.getItem('MyAccount');
+      if(this.infoForm.tempOwner==acc){
+        this.withdrawPoolBtn=true;
+      } else {
+        this.otherWithdrawPoolBtn = true
+      }
+    }else{
+      this.snatchBtn = true
+      this.otherWithdrawPoolBtn = false
+      this.withdrawPoolBtn = false;
+    }
+
+    this.time = info[8]
+    // 当前时间-上次时间
+    this.getCode(info[5]);
   },
   data () {
     return {
+      times: 0,
+      withdrawPoolBtn:false,
+      otherWithdrawPoolBtn:false,
+      snatchBtn:false,
       infoForm:{
         lastOwner:"",
         tempOwner:"",
@@ -108,6 +136,7 @@ export default {
         totalAmount:"",
         snatchCount:"",
         totalSnatchCount:"",
+        timer:0,
         },
       priList:[
         {_id:1,am:"21",amount:"56",totalAmount:"75.2",count:"54",time:"20:01"},
@@ -119,6 +148,37 @@ export default {
     }
   },
   methods:{
+    async otherWithdraw(){
+      var account = localStorage.getItem('MyAccount');
+      let tx = await otherWithdrawPool(account);
+      console.log(tx);
+      this.reload();
+      this.$notify({
+          title: '成功',
+          message: '帮助领取成功',
+          type: 'success'
+        });
+    },
+    async withdraw(){
+      var account = localStorage.getItem('MyAccount');
+      let tx = await withdrawPool(account);
+      console.log(tx);
+      this.reload();
+      this.$notify({
+          title: '成功',
+          message: '领取成功',
+          type: 'success'
+        });
+    },
+    getCode(lastTime) {
+      setInterval(()=>{
+        let showTime = this.time-(moment().unix().valueOf()-lastTime)
+        this.infoForm.timer = showTime >=0?showTime:0
+        if(this.infoForm.timer===0){
+          clearInterval(this.infoForm.timer)
+        }
+      },1000)
+    },
     moreGames(){
       this.$router.push({ path: 'games'})
     },
@@ -127,8 +187,22 @@ export default {
     },
     async snatch(){
       var account = localStorage.getItem('MyAccount');
+      if(this.infoForm.tempOwner == account){
+        this.$notify({
+          title: '提示',
+          message: '不可以重复抢夺',
+          type: 'warning'
+        });
+        return;
+      }
       let tx = await snatchPool(account,decimalToBalance(this.infoForm.lastAmount));
       console.log(tx);
+      this.reload();
+      this.$notify({
+          title: '成功',
+          message: '抢夺成功',
+          type: 'success'
+        });
     }
   }
 }

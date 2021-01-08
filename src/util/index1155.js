@@ -39,8 +39,7 @@ export const setApprovalForAll = async(operator,account) => {
  * @param {address} operator 授权合约
  */
 export const isApprovedForAll = async(account,operator) => {
-    let collateral = await contract.setApprovalForAll(operator,true).estimateGasAndCollateral({from:account});
-    return await contract.setApprovalForAll(operator,true).sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
+    return await contract.isApprovedForAll(account,operator);
 }
 
 /**
