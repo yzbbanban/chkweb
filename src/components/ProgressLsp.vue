@@ -26,10 +26,12 @@ export default {
   },
   methods: {
     clearTime(){
-      clearTimeout(this.timer)
+      clearInterval(this.timer)
     },
     changePrecent(showTime,duation){
-      clearTimeout(this.timer)
+      if(this.timer!=null){
+        clearInterval(this.timer)
+      }
       let totalTime = duation;
       let persent = 36;
       console.log(`showTime: ${showTime}`)
@@ -39,13 +41,13 @@ export default {
       this.percent += per
       if (this.percent >= 100) {
         this.percent = 100
-        clearTimeout(this.timer)
+        clearInterval(this.timer)
       }
       var that = this;
       //current / total = per / 100
       // 100 3600, 0.028
       //per = current * 100 / total
-      setInterval(()=>{
+      this.timer = setInterval(()=>{
         that.percent += 0.028
         // console.log(`that.percent: ${that.percent}`)
       },1000)

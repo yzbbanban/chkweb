@@ -1,6 +1,7 @@
 .el-dia{
     background-image: url("./bg-min.jpg") ;
     color: white;
+    font-size: 20px;
     background-size: cover;
     background-position: center
 }

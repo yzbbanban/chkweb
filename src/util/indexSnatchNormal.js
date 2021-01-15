@@ -3,7 +3,7 @@ import SnatchNormal from "@/abi/SnatchNormal.json";
 
 let contract
 
-const addr = '0x867e407d83df8c7794a01e8788558bf17059a03b'
+const addr = '0x8685ba2fca7d19c07ba70f81c91cc3129f934f07'
  
 /**
  * 全局init(名称使用合约名命名)

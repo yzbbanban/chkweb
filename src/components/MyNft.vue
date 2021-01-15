@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div style="height:30px">
-        <el-button class="create-button" type="text" @click="buyTicket">购买票据</el-button>
+    <div style="height:30px;margin:20px">
+      <el-button class="create-button" type="success" @click="buyTicket">购买票据</el-button>
     </div>
     <el-container v-loading.fullscreen.lock="fullscreenLoading">
       <div class="box-container">

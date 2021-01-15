@@ -1,7 +1,7 @@
 <template>
   <div>
-      <div style="height:30px">
-        <el-button class="create-button" type="text" @click="showDialog">create snatch</el-button>
+      <div style="height:30px;margin:20px">
+        <el-button class="create-button" type="success" @click="showDialog">create snatch</el-button>
       </div>
       <div class="box-container">
           <el-card class="box-card"  v-for="item in priList" :key="item._id">
@@ -75,7 +75,7 @@ export default {
           },
           rules:{
             durationTime :[{required: true, message: '请输入单次时间', trigger: 'blur'}],
-            durationEndTime :[{required: true, message: '请输入单论时间', trigger: 'blur'}],
+            durationEndTime :[{required: true, message: '请输入单轮时间', trigger: 'blur'}],
             increaseRange :[{required: true, message: '请输入涨幅', trigger: 'blur'}],
             tokenId :[{required: true, message: '请输入nft tokenId', trigger: 'blur'}],
             token :[{required: true, message: '请输入代币', trigger: 'blur'}],
@@ -115,7 +115,7 @@ export default {
           }else{
             et = moment.unix(Number(lt)+Number(du)).format("YYYY-MM-DD HH:mm");
           }
-          let l = snatchTimeInfoArr[1]?'--':moment.unix(snatchTimeInfoArr[1]).format("YYYY-MM-DD HH:mm");
+          let l = snatchTimeInfoArr[1]==0?'--':moment.unix(snatchTimeInfoArr[1]).format("YYYY-MM-DD HH:mm");
           this.priList.push({
               _id: ''+snatchId,
               lastPrice:balanceToDecimal(snatchBaseInfoArr[6]),

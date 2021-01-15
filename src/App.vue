@@ -17,11 +17,12 @@
               <el-tab-pane label="Private Snatch" name="Snatchs"></el-tab-pane>
               <el-tab-pane label="MyNft" name="MyNft"></el-tab-pane>
               <el-tab-pane label="NftShop" name="NftShop"></el-tab-pane>
+              <el-tab-pane label="Finance" name="Finance"></el-tab-pane>
             </el-tabs>
         </div>
         <div style="float:right">
           <div class="address" @click="checkAccount">账户ID：{{accountId}}</div>
-          <span class="address"><i class="el-icon-s-opportunity">{{address}}</i></span>
+          <span class="address" @click="wallet"><i class="el-icon-s-opportunity">{{subAddress}}</i></span>
         </div>
 
       </el-header>
@@ -69,6 +70,7 @@ export default {
     await initAIContract()
     getAddress().then(res=>{
       this.address = res
+      this.subAddress = (''+res).substring(0,6)+"..."+(''+res).substring(38,42);
       localStorage.setItem('MyAccount', this.address);
       //localStorage.removeItem('hou');
       this.getUserInfoP()
@@ -83,11 +85,13 @@ export default {
       isRouterAlive: true,
       //http://mmuu.oss-cn-beijing.aliyuncs.com/123456.jpg
       url: require("../src/assets/av.jpg"),
+      subAddress:"--",
       address:"--",
       accountId:"--"
     }
   },
   methods:{
+    wallet(){},
     handleClick(item){
       console.log(item.name)
       if(item.name=="NftShop"){
@@ -96,6 +100,8 @@ export default {
         this.$router.push({ path: '/myNft'})
       }else if(item.name=="Snatchs"){
         this.$router.push({ path: '/games'})
+      }else if(item.name=="Finance"){
+        this.$router.push({ path: '/finance'})
       }
     },
     async getUserInfoP(){
@@ -194,5 +200,7 @@ export default {
   margin: 60px 0;
   overflow-x: hidden;
   background: url("../src/assets/bg-min.jpg"); 
+  background-size: cover;
+  background-position: right;
 }
 </style>

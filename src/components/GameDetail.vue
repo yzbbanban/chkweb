@@ -92,6 +92,7 @@ export default {
     },
     data () {
         return{
+          timer:null,
           account:"",
           fullscreenLoading:false,
           snatchBtn:false,
@@ -185,14 +186,14 @@ export default {
         this.$refs.changeProcess.changePrecent(du-showTime,du);
       },
       getCode(lastTime) {
-        clearTimeout(this.infoForm.timer)
-        clearInterval(this.infoForm.timer)
-        setInterval(()=>{
+        if(this.timer!=null){
+          clearInterval(this.timer)
+        }
+        this.timer = setInterval(()=>{
           let showTime = this.time-(moment().unix().valueOf()-lastTime)
           this.infoForm.timer = showTime >=0?showTime:0
           if(this.infoForm.timer==0){
-            clearInterval(this.infoForm.timer)
-            clearTimeout(this.infoForm.timer)
+            clearInterval(this.timer)
           }
         },1000)
       },
@@ -246,16 +247,16 @@ export default {
               });
           return
         }
-        console.log('account: '+this.account)
-        if(this.infoForm.tempOwner == this.account){
-          this.$notify({
-            title: '提示',
-            message: '不可以连续抢夺',
-            type: 'warning'
-          });
-          this.fullscreenLoading = false
-          return;
-        }
+        // console.log('account: '+this.account)
+        // if(this.infoForm.tempOwner == this.account){
+        //   this.$notify({
+        //     title: '提示',
+        //     message: '不可以连续抢夺',
+        //     type: 'warning'
+        //   });
+        //   this.fullscreenLoading = false
+        //   return;
+        // }
         let tx = await snatchTokenPool(this.account,this.snatchId,decimalToBalance(this.infoForm.lastAmount));
         console.log(tx);
         this.$notify({
