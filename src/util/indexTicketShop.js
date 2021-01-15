@@ -65,7 +65,7 @@ export const shopMap = async (tokenId) => {
  */
 export const buyTicket = async(account,value) => {
     let collateral = await contract.buyTicket().estimateGasAndCollateral({from:account,value});
-    return await contract.buyTicket().sendTransaction({from:account,value,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
+    return await contract.buyTicket().sendTransaction({from:account,value,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized}).executed()
 }
 
 
@@ -77,7 +77,7 @@ export const buyTicket = async(account,value) => {
  */
 export const sellTicket = async(account,tokenId,price) => {
     let collateral = await contract.sellTicker(tokenId,price).estimateGasAndCollateral({from:account});
-    return await contract.sellTicker(tokenId,price).sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
+    return await contract.sellTicker(tokenId,price).sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized}).executed()
 }
 
 /**
@@ -88,5 +88,5 @@ export const sellTicket = async(account,tokenId,price) => {
  */
 export const buySellerTicket = async(account,tokenId,value) => {
     let collateral = await contract.buySellerTicket(tokenId).estimateGasAndCollateral({from:account,value});
-    return await contract.buySellerTicket(tokenId).sendTransaction({from:account,value,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
+    return await contract.buySellerTicket(tokenId).sendTransaction({from:account,value,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized}).executed()
 }

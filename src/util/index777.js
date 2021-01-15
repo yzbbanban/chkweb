@@ -13,6 +13,14 @@ export const init777Contract = async()=>{
     }
 }
 
+/**
+ * 全局init(名称使用合约名命名)
+ */
+export const init777TokenContract = async(tokenAddress)=>{
+    contract = await getContract(tokenAddress,Chicken777);
+    console.log(contract)
+}
+
   
 /**
  * 创建合约调用
@@ -30,7 +38,7 @@ export const get777Contract = ()=>{
  */
 export const approve = async(spender,value,account) => {
     let collateral = await contract.approve(spender,value).estimateGasAndCollateral({from:account});
-    return await contract.approve(spender,value).sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
+    return await contract.approve(spender,value).sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized}).executed()
 }
 
 /**
@@ -38,9 +46,14 @@ export const approve = async(spender,value,account) => {
  * @param {address} holder 使用者
  * @param {address} spender 授权合约
  */
-export const allowance = async(holder,spender,account) => {
-    let collateral = await contract.allowance(holder,spender).estimateGasAndCollateral({from:account});
-    return await contract.allowance(holder,spender).sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
+export const allowance = async(holder,spender) => {
+    return await contract.allowance(holder,spender)
+}
+/**
+ * symbol
+ */
+export const symbol = async() => {
+    return await contract.symbol()
 }
 
 /**

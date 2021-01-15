@@ -76,6 +76,19 @@
     },
     {
       "inputs": [],
+      "name": "helperRate",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "increaseRange",
       "outputs": [
         {
@@ -95,6 +108,19 @@
           "internalType": "address",
           "name": "",
           "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "platformRate",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -282,32 +308,32 @@
         },
         {
           "internalType": "uint256",
-          "name": "durationEndTime",
+          "name": "_durationEndTime",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "durationTime",
+          "name": "_durationTime",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "increaseRange",
+          "name": "_increaseRange",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "totalAmount",
+          "name": "_totalAmount",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "snatchCount",
+          "name": "_snatchCount",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "totalSnatchCount",
+          "name": "_totalSnatchCount",
           "type": "uint256"
         }
       ],

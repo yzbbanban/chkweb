@@ -1,5 +1,5 @@
 import { getContract } from "@/util/base.js";
-import InviteApollo from "@/abi/InviteApollo.json";
+import InviteApollo from "@/abi/Invite.json";
 
 let contract
 
@@ -33,6 +33,11 @@ export const userMap = async (account) => {
 /**
  * 获取用户信息
  * @param {address}} account 
+ *  address owner,  0
+    address referrer, 1
+    uint256 referrerId, 2
+    uint256 id, 3
+    uint256 createTime 4
  */
 export const getUserInfo = async (account) => {
     return await contract.getUserInfo(account);
@@ -44,5 +49,5 @@ export const getUserInfo = async (account) => {
  */
 export const register = async(_referrerId,account) => {
     let collateral = await contract.register(_referrerId).estimateGasAndCollateral({from:account});
-    return await contract.register(_referrerId).sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
+    return await contract.register(_referrerId).sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized}).executed()
 }

@@ -8,77 +8,185 @@
             <div style="cursor:pointer" @click="privateGame(item)">
               <div>ID:{{item._id}}</div>
               <br>
-              <div>抢夺总数量:{{item.am}}</div>
-              <div>奖池总额:{{item.amount}}</div>
-              <div>奖池轮数:{{item.count}}</div>
-              <div>结束时间:{{item.time}}</div>
+              <div>奖池: {{item.amount}}</div>
+              <div>上一次出价: {{item.lastPrice}}</div>
+              <div>上一次出价时间: {{item.lastTime}}</div>
+              <div>开奖时间: {{item.endTime}}</div>
+              <div>当前轮抢夺次数: {{item.count}}</div>
             </div>
           </el-card>
       </div>
       <el-dialog custom-class="el-dia" title="Create Snatch" :visible.sync="dialogFormVisible">
-      <el-form :model="form">
-        <el-form-item label="End time" :label-width="formLabelWidth">
-            <el-date-picker
-              v-model="durationTime"
-              type="datetime"
-              placeholder="set end time">
-            </el-date-picker>
+      <el-form :model="form" :rules="rules" ref="form">
+        <el-form-item prop="durationTime" label="每次持续时长（如: 10-2-30代表10天,2小时,30分钟,无则填写0，如 0-0-30 代表30分钟）" :label-width="formLabelWidth">
+          <el-input v-model="form.durationTime" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="Platform address" :label-width="formLabelWidth">
-          <el-input v-model="form.platformAddress" autocomplete="off"></el-input>
+        <el-form-item prop="durationEndTime" label="每轮持续时长（如: 10-2-30代表10天,2小时,30分钟,无则填写0，如 0-0-30 代表30分钟）" :label-width="formLabelWidth">
+          <el-input v-model="form.durationEndTime" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="Increase range" :label-width="formLabelWidth">
+        <el-form-item prop="token" label="货币合约" :label-width="formLabelWidth">
+          <el-input v-model="form.token" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="nftToken" label="NFT合约" :label-width="formLabelWidth">
+          <el-input v-model="form.nftToken" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="tokenId" label="NFT token ID" :label-width="formLabelWidth">
+          <el-input v-model="form.tokenId" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="submitAmount" label="每轮起始价格" :label-width="formLabelWidth">
+          <el-input v-model="form.submitAmount" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="increaseRange" label="增幅" :label-width="formLabelWidth">
           <el-input v-model="form.increaseRange" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button type="primary" @click="addTokenSnatch('form')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import {addSnatch,getSnatchList,
+        getSnatchBaseInfo,getSnatchTimeInfo,
+        initSnatchNormalContract} from "../util/indexSnatchNormal.js";
+import {decimalToBalance,balanceToDecimal} from "../util/MathUtil.js";
+var moment = require('moment');
 export default {
     name:"Games",
+    async created(){
+      await initSnatchNormalContract();
+      this.initSnatchList();
+    },
     data () {
         return{
-          formLabelWidth:120,
+          formLabelWidth:"120",
           dialogFormVisible:false,
           form: {
             durationTime: '',
-            platformAddress:'',
+            durationEndTime: '',
             increaseRange:'',
-            tokenId:''
+            tokenId:'',
+            token:'',
+            submitAmount:'',
+            nftToken:'0x84979ec412653e65948151949f9fbdc2c3179818'
+          },
+          rules:{
+            durationTime :[{required: true, message: '请输入单次时间', trigger: 'blur'}],
+            durationEndTime :[{required: true, message: '请输入单论时间', trigger: 'blur'}],
+            increaseRange :[{required: true, message: '请输入涨幅', trigger: 'blur'}],
+            tokenId :[{required: true, message: '请输入nft tokenId', trigger: 'blur'}],
+            token :[{required: true, message: '请输入代币', trigger: 'blur'}],
+            submitAmount :[{required: true, message: '请输入起始抢夺价格', trigger: 'blur'}],
+            nftToken :[{required: true, message: '请输入NFT合约', trigger: 'blur'}]
           },
           currentAmount:0,
-          address:"0x10E98765aE49E72Dd11b04a9c0981D79f05BE003",
-          priList:[
-            {_id:1,am:"21",amount:"56",count:"54",time:"20:01"},
-            {_id:2,am:"54",amount:"43",count:"444",time:"20:52"},
-            {_id:3,am:"65",amount:"32",count:"12",time:"20:24"},
-            {_id:4,am:"23",amount:"65",count:"56",time:"20:55"},
-            {_id:5,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:6,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:7,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:8,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:9,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:10,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:11,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:12,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:13,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:14,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:15,am:"76",amount:"43",count:"3",time:"20:11"},
-            {_id:16,am:"12",amount:"2",count:"6",time:"20:33"}]
+          address:"",
+          priList:[]
         }
     },
     methods:{
       showDialog(){
-      this.dialogFormVisible = true;
+        this.dialogFormVisible = true;
       },
       privateGame(item){
-        this.$router.push({ path: 'gameDetail', params: { gameId: item._id }})
+        this.$router.push({ path: 'gameDetail/'+item._id })
+      },
+      async initSnatchList(){
+        this.priList=[]
+        let rlist = await getSnatchList();
+        for (const key in rlist) {
+          let snatchId=rlist[key];
+          //get detail
+          let snatchBaseInfo = await getSnatchBaseInfo(snatchId);
+          let snatchTimeInfo = await getSnatchTimeInfo(snatchId);
+          let snatchBaseInfoArr = JSON.parse(JSON.stringify(snatchBaseInfo))
+          console.log(snatchBaseInfoArr)
+          let snatchTimeInfoArr = JSON.parse(JSON.stringify(snatchTimeInfo))
+          console.log(snatchTimeInfoArr)
+          //todo
+          let du = snatchTimeInfoArr[2];
+          let lt = snatchTimeInfoArr[1];
+          let et
+          if(lt==0){
+            et=0
+          }else{
+            et = moment.unix(Number(lt)+Number(du)).format("YYYY-MM-DD HH:mm");
+          }
+          let l = snatchTimeInfoArr[1]?'--':moment.unix(snatchTimeInfoArr[1]).format("YYYY-MM-DD HH:mm");
+          this.priList.push({
+              _id: ''+snatchId,
+              lastPrice:balanceToDecimal(snatchBaseInfoArr[6]),
+              lastTime:l,
+              endTime:et,
+              count:snatchBaseInfoArr[8],
+              amount:balanceToDecimal(snatchBaseInfoArr[5])})
+        }
+      },
+      async addTokenSnatch(formData){
+        var suc=false
+        this.$refs[formData].validate((valid) => {
+          if (!valid) {         
+            this.$notify({
+              title: '错误',
+              message: '请填写必要信息',
+              type: 'error'
+            });
+          }else{
+            suc = true;
+          }
+        });
+        if(!suc){
+          return
+        }
+        var account = localStorage.getItem('MyAccount');
+        let dt=this.calTimes(this.form.durationTime);
+        let det=this.calTimes(this.form.durationEndTime);
+        let amount = decimalToBalance(this.form.submitAmount)
+        try{
+          let tx = await addSnatch(
+              account,
+              this.form.tokenId,
+              this.form.nftToken,
+              this.form.token,
+              amount,
+              dt,
+              det,
+              this.form.increaseRange)
+          console.log(tx);
+          this.$notify({
+            title: '成功',
+            message: '创建成功',
+            type: 'success'
+          });
+          this.initSnatchList();
+        }catch(e){
+          console.log(e)
+          this.$notify({
+            title: '失败',
+            message: e.message,
+            type: 'error'
+          });
+        }
+        
+        this.dialogFormVisible = false
+        
+      },
+      calTimes(time) {
+        let result = 0
+        //1-23-22
+        if(time.indexOf("-")!=-1){
+          var tArr = time.split("-");
+          let day=86400;
+          let hour=3600;
+          console.log(Number(tArr[0]))
+          result = Number(tArr[0])*day + Number(tArr[1]) * hour + Number(tArr[2])*60
+        }else{
+          result = Number(time)*60;
+        }
+        return result;
       }
     }
 }
@@ -91,10 +199,11 @@ export default {
   margin-left: 50px;
 }
 .box-card {
-  width: 20%;
-  color: #eee;
-  background: rgba(255, 255, 255, 0);
+  width: 25%;
+  color: rgb(255, 255, 255);
+  background: rgba(104, 104, 104, 0.4);
   margin: 25px;
+  padding: 10px;
 }
 .box-container{
   display: flex;

@@ -3,34 +3,27 @@
     <el-container>
       <el-header>
         <div style="float:left">
-          <el-link :underline="false" type="info" href="#/">
-            <el-avatar :src='url'></el-avatar>
-            <span class="sp-text">Snatch</span>
+          <el-link style="line-height: 60px;" :underline="false" type="info" href="#/">
+          <div style="font-size:20px;color:white">
+            <div style="float:left">
+              <el-image style="width: 60px; height: 60px" :src='url'></el-image>
+            </div>
+            小鸡快跑
+          </div>
           </el-link>
         </div>
-        <div style="margin-left:120px;float:left">
-            <el-tabs tab-position="bottom" @tab-click="handleClick">
+        <div style="margin-left:10px;float:left">
+            <el-tabs tab-position="center" @tab-click="handleClick">
               <el-tab-pane label="Private Snatch" name="Snatchs"></el-tab-pane>
               <el-tab-pane label="MyNft" name="MyNft"></el-tab-pane>
               <el-tab-pane label="NftShop" name="NftShop"></el-tab-pane>
             </el-tabs>
         </div>
         <div style="float:right">
-          <span class="address"><i class="el-icon-s-opportunity">  {{address}}</i></span>
+          <div class="address" @click="checkAccount">账户ID：{{accountId}}</div>
+          <span class="address"><i class="el-icon-s-opportunity">{{address}}</i></span>
         </div>
 
-        <!-- 
-          <el-link :underline="false" type="info" href="#/">
-          <el-avatar :src='url'></el-avatar>
-          <span class="sp-text">MySord</span>
-        </el-link>
-        <el-link class="el-m" :underline="false" type="info" href="#/myNft">
-          <span class="sp-text">MyNft</span>
-        </el-link>
-        <el-link class="el-m" :underline="false" type="info" href="#/nftShop">
-          <span class="sp-text">NftShop</span>
-        </el-link>
-        <span class="address"><i class="el-icon-s-opportunity">  {{address}}</i></span> -->
       </el-header>
       <router-view/>
       <el-footer>
@@ -41,66 +34,113 @@
           <img class="footer-img" src="../src/assets/twitter.svg" alt="twitter">
         </div>
       </el-footer>
+      <el-dialog  custom-class="el-dia"
+        title="用户信息"
+        :visible.sync="dialogVisible"
+        width="30%">
+        <div v-if="accountId=='--'">
+          <span>加入推荐关系？</span>
+          <el-input style="margin-bottom:20px" v-model="inputId" placeholder="请输入推荐人ID(默认为1)"></el-input>
+          <br>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="registerAccount">确 定</el-button>
+          </span>
+        </div>
+        <div v-else>
+          <div class="dia-msg">推荐人地址:  {{referrer}}</div>
+          <div class="dia-msg">推荐人Id: {{referrerId}}</div>
+          <br>
+          <br>
+        </div>
+        
+      </el-dialog>
     </el-container>
   </div>
 </template>
 
 <script>
 import { getAddress } from "./util/base.js";
+import { getUserInfo,register,initAIContract } from "./util/indexInvite.js";
 
 export default {
   name: 'App',
-  provide () {    //父组件中通过provide来提供变量，在子组件中通过inject来注入变量。                                             
-    return {
-        reload: this.reload                                              
-    }
-  },
-  created() {
+  async created() {
+    await initAIContract()
     getAddress().then(res=>{
       this.address = res
       localStorage.setItem('MyAccount', this.address);
       //localStorage.removeItem('hou');
+      this.getUserInfoP()
     })
   },
   data () {
     return {
+      inputId:'1',
+      referrer:"--",
+      referrerId:"--",
+      dialogVisible:false,
       isRouterAlive: true,
       //http://mmuu.oss-cn-beijing.aliyuncs.com/123456.jpg
       url: require("../src/assets/av.jpg"),
       address:"--",
+      accountId:"--"
     }
   },
   methods:{
-    reload () {
-      this.isRouterAlive = false;            //先关闭，
-      this.$nextTick(function () {
-        this.isRouterAlive = true;         //再打开
-      }) 
-    },
     handleClick(item){
       console.log(item.name)
       if(item.name=="NftShop"){
-        this.$router.push({path:"nftShop"})
+        this.$router.push({path:"/nftShop"})
       }else if(item.name=="MyNft"){
-        this.$router.push({ path: 'myNft'})
+        this.$router.push({ path: '/myNft'})
       }else if(item.name=="Snatchs"){
-        this.$router.push({ path: 'games'})
+        this.$router.push({ path: '/games'})
       }
     },
+    async getUserInfoP(){
+      let userInfo = await getUserInfo(this.address);
+      let user = JSON.parse(JSON.stringify(userInfo))
+      console.log(user)
+      this.referrer = user[1]
+      this.referrerId = user[2]
+      this.accountId = user[3]==0?'--':''+user[3]
+    },
+    checkAccount(){
+      this.dialogVisible = true
+    },
+    async registerAccount(){
+      let tx = await register(this.inputId,this.address);
+      console.log(tx)
+      this.$notify({
+        title: '成功',
+        message: '注册成功',
+        type: 'success'
+      });
+      this.getUserInfoP()
+      dialogVisible = false
+    }
   }
 }
 </script>
 
 <style>
+.dia-msg{
+  color:#9e00ff
+}
 .el-m{
   margin-left: 100px;
 }
 .sp-text{
-    color: #eee;
+  font-size: 10px;
+  color: #eee;
+  margin-bottom: 20px;
 }
 .address{
+  cursor:pointer;
   height: 60px;
   line-height: 60px;
+  margin-left: 20px;
   float:right;
   color: #eee;
 }
@@ -125,7 +165,7 @@ export default {
   top: 60px;
   bottom: 60px;
   /* overflow-y: scroll; */
-  color: rgb(206, 206, 206);
+  color: rgb(251, 255, 0);
   text-align: left;
 }
 .el-footer{
@@ -153,6 +193,6 @@ export default {
   min-height: 100vh;
   margin: 60px 0;
   overflow-x: hidden;
-  background: url("../src/assets/bg-min.jpg") ; 
+  background: url("../src/assets/bg-min.jpg"); 
 }
 </style>

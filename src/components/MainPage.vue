@@ -8,10 +8,11 @@
 
 <script>
 import snatchMain from "./SnatchMain"
+
 export default {
   name: 'MainPage',
   components: {
-      SnatchMain:snatchMain
+      snatchMain
   },
   data () {
     return {

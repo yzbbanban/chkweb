@@ -3,20 +3,20 @@
     <div style="height:30px">
         <el-button class="create-button" type="text" @click="buyTicket">购买票据</el-button>
     </div>
-    <el-container>
+    <el-container v-loading.fullscreen.lock="fullscreenLoading">
       <div class="box-container">
           <el-card class="box-card"  v-for="item in priList" :key="item._id">
-            <img :src="item.image" class="image">
+            <el-image :src="item.image" style="width: 100%; height: 170px" fit="scale-down"/>
             <div style="padding: 5px;">
               <div>tokenId: {{item.tokenId}}</div>
               <div>name: {{item.name}}</div>
-              <div>description: {{item.description}}</div>
+              <!-- <div>description: {{item.description}}</div> -->
               <div class="bottom clearfix">
                 <time class="time">{{ currentDate }}</time>
                 <el-tooltip class="item" effect="dark" content="直接转移给对方" placement="left">
                   <el-button type="text" class="button" @click="transfer(item)">转移</el-button>
                 </el-tooltip>
-                <el-tooltip class="item" effect="dark" content="设计价格售卖，在商城中显示" placement="right">
+                <el-tooltip class="item" effect="dark" content="设置价格售卖，在商城中显示" placement="right">
                   <el-button type="text" class="button" @click="sell(item)">售卖</el-button>
                 </el-tooltip>
               </div>
@@ -66,23 +66,24 @@
 <script>
 import {initTicketShopContract,ticketPrice,buyTicket,sellTicket,getTicketShopContract} from "../util/indexTicketShop.js"
 import {init1155Contract,tokensOf,safeTransferFrom,setApprovalForAll,isApprovedForAll} from "../util/index1155.js"
-import {decimalToBalance,balanceToDecimal} from "../util/MathUtil.js";
+import {decimalToBalance,balanceToDecimal,etherToBalance} from "../util/MathUtil.js";
 const axios = require('axios');
 
 export default {
     name:"MyNft",
-    inject:['reload'],
     async created(){
       this.account = localStorage.getItem('MyAccount');
       await initTicketShopContract();
       await init1155Contract();
       let pc = await ticketPrice();
-      console.log(JSON.stringify(pc))
-      this.sellPrice = JSON.stringify(pc);
+      console.log('===>'+pc)
+      this.sellPrice = etherToBalance(''+pc);
+
       this.getTicketList();
     },
     data () {
         return{
+          fullscreenLoading:false,
           account:"",
           sellPrice:0,
           formLabelWidth:"120",
@@ -106,23 +107,26 @@ export default {
     },
     methods:{
       async getTicketList(){
+        this.fullscreenLoading=true,
+        this.priList=[]
         let tokens = await tokensOf(this.account);
         console.log(JSON.parse(JSON.stringify(tokens)))
         for (const key in tokens) {
           let tokenId=tokens[key][0];
           console.log(tokenId)
           //get detail
-          let  response = await axios.get('http://192.168.2.17:18756/v1/nft/brbr/'+tokenId+'.json')
+          let  response = await axios.get('http://8.131.95.152:18756/v1/nft/brbr/'+tokenId+'.json')
           let res = response.data;
           console.log(res);
           this.priList.push({tokenId,name:res.name,image:res.image,description:res.description})
         }
+        this.fullscreenLoading = false
       },
       buyTicket(){
         this.buyFormVisible = true;
       },
       async buy(){
-        let tx = await buyTicket(this.account,100000000000000000);
+        let tx = await buyTicket(this.account,decimalToBalance(this.sellPrice));
         console.log(tx)
         this.buyFormVisible = false
         this.$notify({
@@ -130,7 +134,7 @@ export default {
           message: '购买成功',
           type: 'success'
         });
-        this.reload();
+        this.getTicketList();
       },
       privateGame(item){
         this.$router.push({ path: 'gameDetail', params: { gameId: item._id }})
@@ -153,7 +157,7 @@ export default {
           type: 'success'
         });
         this.dialogFormVisible=false
-        this.reload();
+        this.getTicketList();
       },
       async sell(item){
         //先授权
@@ -168,6 +172,7 @@ export default {
           }).then(() => {
             setApprovalForAll(operator,that.account).then(tx=>{
               console.log(tx)
+              this.getTicketList();
               this.$message({
                 type: 'success',
                 message: '授权成功!'
@@ -200,7 +205,7 @@ export default {
           type: 'success'
         });
         this.sellFormVisible = false
-        this.reload();
+        this.getTicketList();
       }
     }
 }
@@ -212,16 +217,16 @@ export default {
   margin-left: 50px;
 }
 .box-card {
-  width: 24%;
+  width: 15%;
   color: #eee;
-  background: rgba(255, 255, 255, 0);
+  background: rgba(133, 133, 133, 0.212);
   margin: 25px;
 }
 .box-container{
   display: flex;
   flex-wrap: wrap;
-  width: 80%;
-  margin-left: 20%;
+  width: 90%;
+  margin-left: 10%;
 }
 .image {
   width: 100%;

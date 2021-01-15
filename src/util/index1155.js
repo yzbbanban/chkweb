@@ -30,7 +30,7 @@ export const get1155Contract = ()=>{
  */
 export const setApprovalForAll = async(operator,account) => {
     let collateral = await contract.setApprovalForAll(operator,true).estimateGasAndCollateral({from:account});
-    return await contract.setApprovalForAll(operator,true).sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
+    return await contract.setApprovalForAll(operator,true).sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized}).executed()
 }
 
 /**
@@ -50,7 +50,7 @@ export const isApprovedForAll = async(account,operator) => {
  */
 export const safeTransferFrom = async(from,to,tokenId) => {
     let collateral = await contract.safeTransferFrom(from,to,tokenId,1,"").estimateGasAndCollateral({from});
-    return await contract.safeTransferFrom(from,to,tokenId,1,"").sendTransaction({from,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized})
+    return await contract.safeTransferFrom(from,to,tokenId,1,"").sendTransaction({from,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized}).executed()
 }
 
 /**

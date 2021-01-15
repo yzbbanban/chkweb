@@ -1,7 +1,11 @@
-import { formatUnits, parseUnits } from 'ethers/lib/utils';
+import { formatUnits, parseUnits,formatEther } from 'ethers/lib/utils';
 
 export function balanceToDecimal(s) {
     return formatUnits(s);
+}
+
+export function etherToBalance(s){
+    return formatEther(s);
 }
 
 export function decimalToBalance(d, decimals = 18) {

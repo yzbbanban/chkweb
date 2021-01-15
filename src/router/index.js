@@ -16,7 +16,7 @@ export default new Router({
       component: MainPage
     },
     {
-      path: '/gameDetail',
+      path: '/gameDetail/:id',
       name: 'GameDetail',
       component: GameDetail
     },

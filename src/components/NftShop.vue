@@ -1,17 +1,17 @@
 <template>
   <div>
-    <el-container>
+    <el-container v-loading.fullscreen.lock="fullscreenLoading">
       <div class="box-container">
           <el-card class="box-card"  v-for="item in priList" :key="item._id">
-            <img :src="item.image" class="image">
+            <el-image :src="item.image" style="width: 100%; height: 170px" fit="scale-down"/>
             <div style="padding: 5px;">
               <div>tokenId: {{item.tokenId}}</div>
-              <div>seller: {{item.seller}}</div>
+              <!-- <div>seller: {{item.seller}}</div> -->
               <div>price: {{item.price}}</div>
               <div>name: {{item.name}}</div>
-              <div>description: {{item.description}}</div>
+              <!-- <div>description: {{item.description}}</div> -->
               <div class="bottom clearfix">
-              <el-button type="text" class="button" @click="buy(item)">购买</el-button>
+                <el-button type="text" class="button" @click="buy(item)">购买</el-button>
               </div>
             </div>
           </el-card>
@@ -40,6 +40,7 @@ export default {
     },
     data () {
         return{
+          fullscreenLoading:false,
           account:"",
           buyForm:{price:0,tokenId:0},
           buyFormVisible:false,
@@ -49,13 +50,15 @@ export default {
     },
     methods:{
       async getShopList(){
+        this.fullscreenLoading=true
         let rlist=await getShopItems();
         console.log(rlist)
+        this.priList=[]
         for (const key in rlist) {
           let tokenId=rlist[key][0];
           console.log(tokenId)
           //get detail
-          let  response = await axios.get('http://192.168.2.17:18756/v1/nft/brbr/'+tokenId+'.json')
+          let  response = await axios.get('http://8.131.95.152:18756/v1/nft/brbr/'+tokenId+'.json')
           let res = response.data;
           console.log(res);
           let shopInfo = await shopMap(tokenId);
@@ -67,6 +70,7 @@ export default {
                       price:balanceToDecimal(shopArr[1])
                       })
         }
+        this.fullscreenLoading=false
       },
       privateGame(item){
         this.$router.push({ path: 'gameDetail', params: { gameId: item._id }})
@@ -77,14 +81,17 @@ export default {
         this.buyForm.tokenId=item.tokenId;
       },
       async buyTicket(){
+        this.fullscreenLoading=true
         let tx = await buySellerTicket(this.account,
                                 this.buyForm.tokenId,
                                 decimalToBalance(this.buyForm.price));
+        this.getShopList();
         this.$notify({
           title: '成功',
           message: '购买成功',
           type: 'success'
         });
+        this.fullscreenLoading=false
         this.buyFormVisible=false
       }
     }
@@ -93,20 +100,21 @@ export default {
 
 <style scoped>
 .box-card {
-  width: 24%;
+  width: 15%;
   color: #eee;
-  background: rgba(255, 255, 255, 0);
+  background: rgba(133, 133, 133, 0.212);
   margin: 25px;
 }
 .box-container{
   display: flex;
   flex-wrap: wrap;
-  width: 80%;
-  margin-left: 20%;
+  width: 90%;
+  margin-left: 10%;
 }
 .image {
   width: 100%;
   display: block;
+  height:150px
 }
 .title{
   color: white;
