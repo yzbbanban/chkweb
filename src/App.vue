@@ -14,16 +14,28 @@
         </div>
         <div style="margin-left:10px;float:left">
             <el-tabs tab-position="center" @tab-click="handleClick">
-              <el-tab-pane label="Private Snatch" name="Snatchs"></el-tab-pane>
-              <el-tab-pane label="MyNft" name="MyNft"></el-tab-pane>
-              <el-tab-pane label="NftShop" name="NftShop"></el-tab-pane>
-              <el-tab-pane label="Finance" name="Finance"></el-tab-pane>
+              <el-tab-pane label="主池" name="MainSnatch"></el-tab-pane>
+              <el-tab-pane label="私有池" name="Snatchs"></el-tab-pane>
+              <el-tab-pane label="我的nft" name="MyNft"></el-tab-pane>
+              <el-tab-pane label="小鸡商店" name="NftShop"></el-tab-pane>
+              <el-tab-pane label="货币众筹" name="Finance"></el-tab-pane>
             </el-tabs>
         </div>
         <div style="float:right">
-          <div class="address" @click="checkAccount">账户ID：{{accountId}}</div>
           <span class="address" @click="wallet"><i class="el-icon-s-opportunity">{{subAddress}}</i></span>
         </div>
+        <div style="float:right;margin-top:10px">
+          <el-dropdown @command="handleCommand">
+            <el-button style="color:white" type="text">
+              账户ID：{{accountId}} 更多<i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="info">个人信息</el-dropdown-item>
+              <el-dropdown-item command="reward">领取奖励</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </div>
+
 
       </el-header>
       <router-view/>
@@ -49,12 +61,37 @@
           </span>
         </div>
         <div v-else>
-          <div class="dia-msg">推荐人地址:  {{referrer}}</div>
-          <div class="dia-msg">推荐人Id: {{referrerId}}</div>
+          <div class="dia-msg"><i class="el-icon-s-custom"> 推荐人地址: </i> 
+            <div>{{referrer}}</div>
+          </div>
+          <br>
+          <div class="dia-msg"><i class="el-icon-bank-card"> 推荐人Id: {{referrerId}}</i>
+          </div>
+          <br>
+          <div class="dia-msg"><i class="el-icon-share"> 我的推荐链接: </i>
+            <el-link :href="inviteUrl" target="_blank">http://as.yzbbanban.com{{inviteUrl}}</el-link>
+          </div>
           <br>
           <br>
         </div>
         
+      </el-dialog>
+
+      <el-dialog custom-class="el-dia"
+        title="领取奖励"
+        :visible.sync="rewardDialogVisible"
+        width="30%">
+        <div>
+          <span>🎊 推荐奖励: {{inviteReward}} cfx</span>
+        </div>
+        <br>
+        <div>
+          <span>🎉 彩蛋奖励: {{surprise}} cfx</span>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="rewardDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="withdraw">确认领取</el-button>
+        </span>
       </el-dialog>
     </el-container>
   </div>
@@ -63,21 +100,27 @@
 <script>
 import { getAddress } from "./util/base.js";
 import { getUserInfo,register,initAIContract } from "./util/indexInvite.js";
+import {initSnatchContract,getRewards,withdrawReward} from "./util/indexSnatch.js";
+import {decimalToBalance,balanceToDecimal} from "./util/MathUtil.js";
 
 export default {
   name: 'App',
   async created() {
     await initAIContract()
-    getAddress().then(res=>{
-      this.address = res
-      this.subAddress = (''+res).substring(0,6)+"..."+(''+res).substring(38,42);
-      localStorage.setItem('MyAccount', this.address);
-      //localStorage.removeItem('hou');
-      this.getUserInfoP()
-    })
+    await initSnatchContract()
+    let res = await getAddress()
+    this.address = ''+res;
+    this.subAddress = (''+res).substring(0,6)+"..."+(''+res).substring(38,42);
+    localStorage.setItem('MyAccount', this.address);
+    //localStorage.removeItem('hou');
+    this.getUserInfoP()
   },
   data () {
     return {
+      inviteReward:0,
+      surprise:0,
+      inviteUrl:'/#/invite/1',
+      rewardDialogVisible:false,
       inputId:'1',
       referrer:"--",
       referrerId:"--",
@@ -102,6 +145,10 @@ export default {
         this.$router.push({ path: '/games'})
       }else if(item.name=="Finance"){
         this.$router.push({ path: '/finance'})
+      }else if(item.name=="MainSnatch"){
+        if(this.$route.path!="/"){
+          this.$router.push({ path: '/'})
+        }
       }
     },
     async getUserInfoP(){
@@ -111,6 +158,38 @@ export default {
       this.referrer = user[1]
       this.referrerId = user[2]
       this.accountId = user[3]==0?'--':''+user[3]
+      this.inviteUrl = '/#/invite/'+ this.referrerId
+    },
+    async handleCommand(command){
+      if(command=='reward'){
+        this.rewardDialogVisible = true
+        let result = await getRewards(this.address)
+        let rewardArr=JSON.parse(JSON.stringify(result))
+        console.log(rewardArr)
+        this.inviteReward = balanceToDecimal(rewardArr[0]);
+        this.surprise = balanceToDecimal(rewardArr[1]);
+      }else{
+        this.checkAccount()
+      }
+    },
+    async withdraw(){
+      if(this.inviteReward ==0 && this.surprise == 0){
+        this.$notify({
+          title: '失败',
+          message: '无可领取奖励',
+          type: 'error'
+        });
+        this.rewardDialogVisible = false
+        return
+      }
+      let tx = await withdrawReward(this.address);
+      console.log(tx)
+      this.$notify({
+        title: '成功',
+        message: '领取成功，请查看余额',
+        type: 'success'
+      });
+      this.rewardDialogVisible = false
     },
     checkAccount(){
       this.dialogVisible = true
@@ -132,7 +211,8 @@ export default {
 
 <style>
 .dia-msg{
-  color:#9e00ff
+  color:#000000;
+  font-size:15px
 }
 .el-m{
   margin-left: 100px;

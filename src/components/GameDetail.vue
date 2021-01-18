@@ -5,11 +5,11 @@
       <el-col :span="4">
         <el-card class="box-card1">
           <el-form :model="infoForm" status-icon ref="infoForm">
-          <el-form-item label="777名称:" prop="tokenName">
-            <span>{{infoForm.tokenName}}</span>
+          <el-form-item label="代币名称:" prop="tokenName">
+            <span style="color:yellow">{{infoForm.tokenName}}</span>
           </el-form-item>
-          <el-form-item label="777余额:" prop="tokenBalance">
-            <span>{{infoForm.tokenBalance}}</span>
+          <el-form-item label="代币余额:" prop="tokenBalance">
+            <span style="color:yellow">{{infoForm.tokenBalance}}</span>
           </el-form-item>
           </el-form>
         </el-card>
@@ -26,8 +26,11 @@
         
         <progress-lsp ref="changeProcess"></progress-lsp>
         <el-form :model="infoForm" status-icon ref="infoForm" label-width="150px">
-          <el-form-item label="777" prop="token">
-            <span>{{infoForm.token}}</span>
+          <el-form-item label="创建者" prop="owner">
+            <span style="color:yellow">{{infoForm.owner}}</span>
+          </el-form-item>
+          <el-form-item label="代币合约" prop="token">
+            <span style="color:yellow">{{infoForm.token}}</span>
           </el-form-item>
           <el-form-item label="上一次出价" prop="lastAmount">
             <span>{{infoForm.lastAmount}}</span>
@@ -88,10 +91,12 @@ export default {
       console.log('===>'+this.snatchId)
       this.account = localStorage.getItem('MyAccount');
       await initSnatchNormalContract();
+      this.refresh()
       this.initPrivateSnatch();
     },
     data () {
         return{
+          refreshTime:null,
           timer:null,
           account:"",
           fullscreenLoading:false,
@@ -99,6 +104,7 @@ export default {
           withdrawPoolBtn:false,
           otherWithdrawPoolBtn:false,
           infoForm:{
+            owner:"",
             token:"",
             tokenName:"",
             tokenBalance:"",
@@ -123,6 +129,15 @@ export default {
         }
     },
     methods:{
+      refresh(){
+        if(this.refreshTime!=null){
+          clearInterval(this.refreshTime)
+        }
+        this.refreshTime = setInterval(()=>{
+          console.log('refresh')
+          this.initPrivateSnatch()
+        },7000)
+      },
       async initPrivateSnatch(){
         this.$refs.changeProcess.clearTime();
         let snatchBaseInfo = await getSnatchBaseInfo(this.snatchId);
@@ -142,6 +157,7 @@ export default {
         console.log(`balance:${balance}`)
         this.infoForm.tokenName=''+name;
         this.infoForm.tokenBalance=balanceToDecimal(''+balance);
+        this.infoForm.owner = snatchBaseInfoArr[1]
         this.infoForm.lastOwner = snatchBaseInfoArr[2]
         this.infoForm.tempOwner = snatchBaseInfoArr[3]==address0?"--":snatchBaseInfoArr[3]
         this.infoForm.amount = balanceToDecimal(snatchBaseInfoArr[4])
@@ -183,6 +199,9 @@ export default {
       getChick(lastTime){
         let showTime = this.time-(moment().unix().valueOf()-lastTime)
         let du = Number(this.infoForm.durationTime)
+        if(showTime<=0){
+          showTime=0;
+        }
         this.$refs.changeProcess.changePrecent(du-showTime,du);
       },
       getCode(lastTime) {
@@ -218,22 +237,43 @@ export default {
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
-            approve(operator,decimalToBalance(100000),that.account).then(tx=>{
-              console.log(tx)
-              this.initPrivateSnatch();
-              this.$message({
-                type: 'success',
-                message: '授权成功!'
+            this.fullscreenLoading=true
+            try {
+              approve(operator,decimalToBalance(100000),that.account).then(tx=>{
+                console.log(tx)
+                this.initPrivateSnatch();
+                this.$message({
+                  type: 'success',
+                  message: '授权成功!'
+                });
+                this.fullscreenLoading=false
+              })
+            } catch (error) {
+              this.$notify({
+                title: '取消',
+                message: '取消成功',
+                type: 'info'
               });
-            })
+              this.fullscreenLoading=false
+              return
+            }
           }).catch(() => {
             this.$message({
               type: 'info',
-              message: '授权失败'
-            });          
+              message: '取消授权'
+            });    
+            this.fullscreenLoading=false     
           });
         }else{
-          this.snatchNormal()
+          try{
+            this.snatchNormal()
+          }catch(e){
+            this.fullscreenLoading=false
+            this.$message({
+                type: 'error',
+                message: '取消!'
+              });
+          }
         }
       },
       async snatchNormal(){
@@ -245,6 +285,7 @@ export default {
                 type: 'error',
                 message: '余额不足!'
               });
+          this.fullscreenLoading=false
           return
         }
         // console.log('account: '+this.account)
@@ -257,14 +298,25 @@ export default {
         //   this.fullscreenLoading = false
         //   return;
         // }
-        let tx = await snatchTokenPool(this.account,this.snatchId,decimalToBalance(this.infoForm.lastAmount));
-        console.log(tx);
+        try {
+          let tx = await snatchTokenPool(this.account,this.snatchId,decimalToBalance(this.infoForm.lastAmount));
+          console.log(tx);
+        } catch (error) {
+          this.$notify({
+              title: '取消',
+              message: '取消成功',
+              type: 'info'
+          });
+          this.fullscreenLoading=false
+          return
+        }
         this.$notify({
             title: '成功',
             message: '抢夺成功',
             type: 'success'
           });
         this.initPrivateSnatch()
+        this.fullscreenLoading=false
       },
       async withdrawNormal(){
         this.openFullScreen()
@@ -277,17 +329,38 @@ export default {
           this.fullscreenLoading = false
           return;
         }
-        let tx = await withdrawPool(this.account,this.snatchId);
+        try {
+          let tx = await withdrawPool(this.account,this.snatchId);
+        } catch (error) {
+          this.$notify({
+              title: '取消',
+              message: '取消成功',
+              type: 'info'
+          });
+          this.fullscreenLoading=false
+          return
+        }
+
         this.$notify({
             title: '成功',
-            message: '帮助成功',
+            message: '领取成功',
             type: 'success'
           });
         this.initPrivateSnatch()
       },
       async otherWithdrawNormal(){
         this.openFullScreen()
-        let tx = await otherWithdrawToken(this.account,this.snatchId);
+        try {
+          let tx = await otherWithdrawToken(this.account,this.snatchId);
+        } catch (error) {
+          this.$notify({
+              title: '取消',
+              message: '取消成功',
+              type: 'info'
+          });
+          this.fullscreenLoading=false
+          return
+        }
         this.$notify({
             title: '成功',
             message: '帮助成功',

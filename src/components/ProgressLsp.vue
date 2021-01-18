@@ -34,14 +34,13 @@ export default {
       }
       let totalTime = duation;
       let persent = 36;
-      console.log(`showTime: ${showTime}`)
       let per = (Number(showTime)/Number(totalTime)) * 100
-      console.log(`per: ${per}`)
       this.percent = 0
       this.percent += per
       if (this.percent >= 100) {
         this.percent = 100
         clearInterval(this.timer)
+        return
       }
       var that = this;
       //current / total = per / 100

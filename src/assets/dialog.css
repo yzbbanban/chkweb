@@ -2,8 +2,8 @@
     background-image: url("./bg-min.jpg") ;
     color: white;
     font-size: 20px;
-    background-size: cover;
-    background-position: center
+    /* background-size: cover; */
+    /* background-position: center */
 }
 .el-dialog__title {
     line-height: 24px;

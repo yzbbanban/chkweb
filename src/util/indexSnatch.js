@@ -8,7 +8,7 @@ let contract
  */
 export const initSnatchContract = async()=>{
     if(contract == null){
-        contract = await getContract('0x839ea05fa5f98dc4d97779f4f673ed66ea0d088d',Snatch);
+        contract = await getContract('0x84d3f816dde2bc581c10ef5a65af79c6dc30ddff',Snatch);
         console.log(contract)
     }
 }
@@ -29,6 +29,12 @@ export const getSnatchContract = ()=>{
 export const getNow = async () => {
     return await contract.getNow();
 }
+/**
+ * 获取奖励 [0] 推荐奖励，[1]彩蛋奖励
+ */
+export const getRewards = async (account) => {
+    return await contract.getRewards(account);
+}
 
 /**
  * 获取历史获胜玩家
@@ -44,6 +50,13 @@ export const getWinners = async () => {
  */
 export const getWinnerAddresses = async () => {
     return await contract.getWinnerAddresses();
+}
+
+/**
+ * 彩蛋每抢夺xx次，可获得
+ */
+export const getSurprise = async () => {
+    return await contract.surprise();
 }
 
 
@@ -95,5 +108,15 @@ export const otherWithdrawPool = async(account) => {
     let collateral = await contract.otherWithdraw().estimateGasAndCollateral({from:account});
     console.log(collateral)
     return await contract.otherWithdraw().sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized}).executed()
+}
+
+/**
+ * 赢家收取收益
+ * @param {address} account 执行人
+ */
+export const withdrawReward = async(account) => {
+    let collateral = await contract.withdrawReward(account).estimateGasAndCollateral({from:account});
+    console.log(collateral)
+    return await contract.withdrawReward(account).sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized}).executed()
 }
 

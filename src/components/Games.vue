@@ -36,13 +36,13 @@
         <el-form-item prop="submitAmount" label="每轮起始价格" :label-width="formLabelWidth">
           <el-input v-model="form.submitAmount" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item prop="increaseRange" label="增幅" :label-width="formLabelWidth">
+        <el-form-item prop="increaseRange" label="增幅(当前轮每100次)" :label-width="formLabelWidth">
           <el-input v-model="form.increaseRange" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addTokenSnatch('form')">确 定</el-button>
+        <el-button type="primary" v-loading.fullscreen.lock="fullscreenLoading"  @click="addTokenSnatch('form')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -52,16 +52,21 @@
 import {addSnatch,getSnatchList,
         getSnatchBaseInfo,getSnatchTimeInfo,
         initSnatchNormalContract} from "../util/indexSnatchNormal.js";
+import {getNftTokenAddress} from "../util/index1155.js";
 import {decimalToBalance,balanceToDecimal} from "../util/MathUtil.js";
 var moment = require('moment');
 export default {
     name:"Games",
     async created(){
+      this.form.nftToken = getNftTokenAddress();
       await initSnatchNormalContract();
+      this.refresh();
       this.initSnatchList();
     },
     data () {
         return{
+          refreshTime:null,
+          fullscreenLoading:false,
           formLabelWidth:"120",
           dialogFormVisible:false,
           form: {
@@ -71,7 +76,7 @@ export default {
             tokenId:'',
             token:'',
             submitAmount:'',
-            nftToken:'0x84979ec412653e65948151949f9fbdc2c3179818'
+            nftToken:''
           },
           rules:{
             durationTime :[{required: true, message: '请输入单次时间', trigger: 'blur'}],
@@ -88,6 +93,15 @@ export default {
         }
     },
     methods:{
+      refresh(){
+        if(this.refreshTime!=null){
+          clearInterval(this.refreshTime)
+        }
+        this.refreshTime = setInterval(()=>{
+          console.log('refresh')
+          this.initSnatchList()
+        },20000)
+      },
       showDialog(){
         this.dialogFormVisible = true;
       },
@@ -122,7 +136,7 @@ export default {
               lastTime:l,
               endTime:et,
               count:snatchBaseInfoArr[8],
-              amount:balanceToDecimal(snatchBaseInfoArr[5])})
+              amount:balanceToDecimal(snatchBaseInfoArr[4])})
         }
       },
       async addTokenSnatch(formData){
@@ -141,6 +155,7 @@ export default {
         if(!suc){
           return
         }
+        this.fullscreenLoading=true
         var account = localStorage.getItem('MyAccount');
         let dt=this.calTimes(this.form.durationTime);
         let det=this.calTimes(this.form.durationEndTime);
@@ -170,7 +185,7 @@ export default {
             type: 'error'
           });
         }
-        
+        this.fullscreenLoading = false
         this.dialogFormVisible = false
         
       },
@@ -195,7 +210,7 @@ export default {
 <style scoped>
 .create-button{
   float: left;
-  font-size: 40px;
+  font-size: 20px;
   margin-left: 50px;
 }
 .box-card {

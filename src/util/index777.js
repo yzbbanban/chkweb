@@ -8,7 +8,7 @@ let contract
  */
 export const init777Contract = async()=>{
     if(contract == null){
-        contract = await getContract('0x8ab7404a351fcea7c013592255b3f51f27512ff2',Chicken777);
+        contract = await getContract('0x85a38a8e22c8242f4102d20e11036c09c66be46e',Chicken777);
         console.log(contract)
     }
 }

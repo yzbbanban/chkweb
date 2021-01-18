@@ -14,6 +14,7 @@ export default {
     },
     data () {
         return{
+          fullscreenLoading:false,
           account:"",
         }
     },

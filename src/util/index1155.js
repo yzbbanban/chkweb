@@ -3,12 +3,14 @@ import Ticket1155Nft from "@/abi/Ticket1155Nft.json";
 
 let contract
 
+let tokenAddress = "0x804bf5c7911c26b6e28b8a11f177c246bd58aea7"
+
 /**
  * 全局init(名称使用合约名命名)
  */
 export const init1155Contract = async()=>{
     if(contract == null){
-        contract = await getContract('0x84979ec412653e65948151949f9fbdc2c3179818',Ticket1155Nft);
+        contract = await getContract(tokenAddress,Ticket1155Nft);
         console.log(contract)
     }
 }
@@ -21,6 +23,15 @@ export const init1155Contract = async()=>{
  */
 export const get1155Contract = ()=>{
     return contract
+}
+  
+/**
+ * 创建合约调用
+ * @param {tokenAddress} tokenAddress 
+ * @param {abi} abi 
+ */
+export const getNftTokenAddress = ()=>{
+    return tokenAddress
 }
 
 /**

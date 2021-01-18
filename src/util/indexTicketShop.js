@@ -3,21 +3,29 @@ import TicketShop from "@/abi/TicketShop.json";
 
 let contract
 
+let contractAddress='0x8c096b239da3cbc48aacdd03cbe12c5d5079f833'
+
 /**
  * 全局init(名称使用合约名命名)
  */
 export const initTicketShopContract = async()=>{
     if(contract == null){
-        contract = await getContract('0x8a8e4095ee3ee65dd200b5e4f9bceab285f9cd48',TicketShop);
+        contract = await getContract(contractAddress,TicketShop);
         console.log(contract)
     }
 }
 
   
 /**
+ * 获取地址
+ */
+export const getTicketShopContractAddress = ()=>{
+    return contractAddress
+}
+
+  
+/**
  * 创建合约调用
- * @param {tokenAddress} tokenAddress 
- * @param {abi} abi 
  */
 export const getTicketShopContract = ()=>{
     return contract
@@ -66,6 +74,16 @@ export const shopMap = async (tokenId) => {
 export const buyTicket = async(account,value) => {
     let collateral = await contract.buyTicket().estimateGasAndCollateral({from:account,value});
     return await contract.buyTicket().sendTransaction({from:account,value,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized}).executed()
+}
+
+/**
+ * 取消商品上架
+ * @param {address} account 执行人
+ * @param {number} tokenId tokenId
+ */
+export const cancelShell = async(account,tokenId) => {
+    let collateral = await contract.cancelShell(tokenId).estimateGasAndCollateral({from:account});
+    return await contract.cancelShell(tokenId).sendTransaction({from:account,gas:collateral.gasLimit,storageLimit:collateral.storageCollateralized}).executed()
 }
 
 

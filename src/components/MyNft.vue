@@ -2,6 +2,7 @@
   <div>
     <div style="height:30px;margin:20px">
       <el-button class="create-button" type="success" @click="buyTicket">购买票据</el-button>
+      <span style="color:white">剩余票据: {{totalTicket}}</span>
     </div>
     <el-container v-loading.fullscreen.lock="fullscreenLoading">
       <div class="box-container">
@@ -64,7 +65,7 @@
 </template>
 
 <script>
-import {initTicketShopContract,ticketPrice,buyTicket,sellTicket,getTicketShopContract} from "../util/indexTicketShop.js"
+import {initTicketShopContract,ticketPrice,buyTicket,totalTicket,sellTicket,getTicketShopContractAddress,getTicketShopContract} from "../util/indexTicketShop.js"
 import {init1155Contract,tokensOf,safeTransferFrom,setApprovalForAll,isApprovedForAll} from "../util/index1155.js"
 import {decimalToBalance,balanceToDecimal,etherToBalance} from "../util/MathUtil.js";
 const axios = require('axios');
@@ -83,6 +84,7 @@ export default {
     },
     data () {
         return{
+          totalTicket:0,
           fullscreenLoading:false,
           account:"",
           sellPrice:0,
@@ -101,7 +103,7 @@ export default {
             from:"",
             tokenId:0
           },
-          address:"0x10E98765aE49E72Dd11b04a9c0981D79f05BE003",
+          address:"--",
           priList:[]
         }
     },
@@ -115,25 +117,37 @@ export default {
           let tokenId=tokens[key][0];
           console.log(tokenId)
           //get detail
-          let  response = await axios.get('http://8.131.95.152:18756/v1/nft/brbr/'+tokenId+'.json')
+          let response = await axios.get('http://nft.yzbbanban.com:18756/v1/nft/brbr/'+tokenId+'.json')
           let res = response.data;
           console.log(res);
           this.priList.push({tokenId,name:res.name,image:res.image,description:res.description})
         }
+        this.totalTicket = ''+await totalTicket();
         this.fullscreenLoading = false
       },
       buyTicket(){
         this.buyFormVisible = true;
       },
       async buy(){
-        let tx = await buyTicket(this.account,decimalToBalance(this.sellPrice));
-        console.log(tx)
-        this.buyFormVisible = false
-        this.$notify({
-          title: '成功',
-          message: '购买成功',
-          type: 'success'
-        });
+        this.fullscreenLoading = true
+        try {
+          let tx = await buyTicket(this.account,decimalToBalance(this.sellPrice));
+          console.log(tx)
+          this.buyFormVisible = false
+          this.$notify({
+            title: '成功',
+            message: '购买成功',
+            type: 'success'
+          });
+        } catch (error) {
+          console.log('lsp===>'+error)
+          this.$notify({
+            title: '取消',
+            message: '购买取消',
+            type: 'info'
+          });
+        }
+        
         this.getTicketList();
       },
       privateGame(item){
@@ -141,7 +155,7 @@ export default {
       },
       transfer(item){
         console.log(item)
-        this.dialogFormVisible=true
+        this.dialogFormVisible = true
         this.form={
           from: this.account,
           to:'',
@@ -149,8 +163,19 @@ export default {
         }
       },
       async transferTicket(){
-        let tx = await safeTransferFrom(this.form.from,this.form.to,this.form.tokenId);
-        console.log(tx);
+        this.fullscreenLoading = true
+        try {
+          let tx = await safeTransferFrom(this.form.from,this.form.to,this.form.tokenId);
+          console.log(tx);
+        } catch (error) {
+          this.$notify({
+            title: '取消',
+            message: '取消成功',
+            type: 'info'
+          });
+          this.dialogFormVisible=false
+          return
+        }
         this.$notify({
           title: '成功',
           message: '转移成功',
@@ -161,7 +186,7 @@ export default {
       },
       async sell(item){
         //先授权
-        let operator = "0x8a8e4095ee3ee65dd200b5e4f9bceab285f9cd48";
+        let operator = getTicketShopContractAddress();
         let approved = await isApprovedForAll(this.account,operator);
         var that = this;
         if(!approved){
@@ -170,6 +195,7 @@ export default {
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
+            that.fullscreenLoading = true,
             setApprovalForAll(operator,that.account).then(tx=>{
               console.log(tx)
               this.getTicketList();
@@ -213,7 +239,7 @@ export default {
 
 <style scoped>
 .create-button{
-  font-size: 40px;
+  font-size: 20px;
   margin-left: 50px;
 }
 .box-card {
