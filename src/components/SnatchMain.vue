@@ -187,7 +187,7 @@ export default {
       this.refreshTime = setInterval(()=>{
         console.log('refresh')
         this.initSnatch()
-       },7000)
+       },4000)
     },
     async otherWithdraw(){
       var account = localStorage.getItem('MyAccount');

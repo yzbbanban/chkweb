@@ -38,7 +38,13 @@
 
 
       </el-header>
-      <router-view/>
+      <router-view v-show="isGameStart"/>
+      <div v-show="!isGameStart" style="margin-left:40%;margin-top:40%;text-size:100px">
+        <FlipDown
+          :endDate="1611057600000"  
+          @timeUp="gameStart"            
+          />
+      </div>
       <el-footer>
         <div class="footer-div">
           <img class="footer-img" src="../src/assets/community.svg" alt="community">
@@ -102,9 +108,13 @@ import { getAddress } from "./util/base.js";
 import { getUserInfo,register,initAIContract } from "./util/indexInvite.js";
 import {initSnatchContract,getRewards,withdrawReward} from "./util/indexSnatch.js";
 import {decimalToBalance,balanceToDecimal} from "./util/MathUtil.js";
+import FlipDown from 'vue-flip-down';
 
 export default {
   name: 'App',
+  components: {
+    'FlipDown': FlipDown 
+  },
   async created() {
     await initAIContract()
     await initSnatchContract()
@@ -118,6 +128,7 @@ export default {
   data () {
     return {
       inviteReward:0,
+      isGameStart:false,
       surprise:0,
       inviteUrl:'/#/invite/1',
       rewardDialogVisible:false,
@@ -134,6 +145,9 @@ export default {
     }
   },
   methods:{
+    gameStart(){
+      this.isGameStart = true;
+    },
     wallet(){},
     handleClick(item){
       console.log(item.name)
@@ -210,6 +224,22 @@ export default {
 </script>
 
 <style>
+.vue-countdown-component .time-box {
+    position: relative;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 120px;
+    min-width: 100px;
+    font-size: 100px;
+    text-align: center;
+    background-color: #6c96e8;
+    -webkit-perspective: 60px;
+    perspective: 60px;
+    border-radius: 3px;
+    padding: 0 2px;
+    color: #fff;
+    line-height: 120px;
+}
 .dia-msg{
   color:#000000;
   font-size:15px

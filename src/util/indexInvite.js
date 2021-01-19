@@ -8,7 +8,8 @@ let contract
  */
 export const initAIContract = async()=>{
     if(contract == null){
-        contract = await getContract('0x87546dc2579e0d14c7b16fd646a749853cb96757',InviteApollo);
+        //0x87546dc2579e0d14c7b16fd646a749853cb96757
+        contract = await getContract('0x8a98ef4364e3fa1dace4ef7915f234c7765e4988',InviteApollo);
         console.log(contract)
     }
 }

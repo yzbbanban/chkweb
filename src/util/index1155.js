@@ -3,7 +3,8 @@ import Ticket1155Nft from "@/abi/Ticket1155Nft.json";
 
 let contract
 
-let tokenAddress = "0x804bf5c7911c26b6e28b8a11f177c246bd58aea7"
+// let tokenAddress = "0x804bf5c7911c26b6e28b8a11f177c246bd58aea7"
+let tokenAddress = "0x883cba81bb17204095a2b4ef8dee7b7a7ca2ffa0"
 
 /**
  * 全局init(名称使用合约名命名)

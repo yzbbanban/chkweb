@@ -5,10 +5,14 @@ window.jssdkcfx = new Conflux({
 window.jssdkcfx.provider = window.conflux
 console.log('----------')
 console.log(window.jssdkcfx.provider)
+console.log(window.jssdkcfx)
+console.log('==chainId==>')
+let chainId = window.conflux.chainId;
+console.log(chainId)
 window.conflux.on('accountsChanged',async function (acc) {
     // let accounts = await conflux.enable();
     // console.log('=====>'+accounts[0])
-    console.log('=====>'+acc)
+    console.log('===acc==>'+acc)
   })
 /**
  * 创建合约调用
@@ -17,6 +21,10 @@ window.conflux.on('accountsChanged',async function (acc) {
  */
 export const getContract = (address, abi)=>{
     return window.jssdkcfx.Contract({abi,address});
+}
+
+export const getNetWork=()=>{
+    return chainId==1?'test':'main'
 }
 
 /**

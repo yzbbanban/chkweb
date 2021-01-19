@@ -44,7 +44,7 @@
     <el-dialog custom-class="el-dia" title="销售" :visible.sync="sellFormVisible">
       <el-form :model="sellForm">
         <span >tokenId: {{sellForm.tokenId}}</span>
-        <el-form-item label="price" :label-width="formLabelWidth">
+        <el-form-item label="价格（cfx）" :label-width="formLabelWidth">
           <el-input v-model="sellForm.price" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
@@ -238,6 +238,9 @@ export default {
 </script>
 
 <style scoped>
+.el-button--text{
+  color: #a56b00;
+}
 .create-button{
   font-size: 20px;
   margin-left: 50px;
@@ -252,7 +255,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   width: 90%;
-  margin-left: 10%;
+  margin-left: 5%;
 }
 .image {
   width: 100%;

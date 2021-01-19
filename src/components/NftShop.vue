@@ -17,14 +17,14 @@
             </div>
           </el-card>
       </div>
-      <el-dialog custom-class="el-dia" title="Create Snatch" :visible.sync="buyFormVisible">
+      <el-dialog custom-class="el-dia" title="购买" :visible.sync="buyFormVisible">
         <span style="color:white">确定使用 {{buyForm.price}} 购买 tokenId: {{buyForm.tokenId}} 吗？</span>
         <div slot="footer" class="dialog-footer">
           <el-button @click="buyFormVisible = false">取 消</el-button>
           <el-button type="primary" @click="buyTicket">确 定</el-button>
         </div>
         </el-dialog>
-        <el-dialog custom-class="el-dia" title="Create Snatch" :visible.sync="cancelFormVisible">
+        <el-dialog custom-class="el-dia" title="撤销" :visible.sync="cancelFormVisible">
         <span style="color:white">确认撤销 tokenId: {{cancelForm.tokenId}} 吗？</span>
         <div slot="footer" class="dialog-footer">
           <el-button @click="cancelFormVisible = false">取 消</el-button>
@@ -146,6 +146,9 @@ export default {
 </script>
 
 <style scoped>
+.el-button--text{
+  color: #a56b00;
+}
 .box-card {
   width: 15%;
   color: #eee;

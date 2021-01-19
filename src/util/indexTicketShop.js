@@ -3,7 +3,8 @@ import TicketShop from "@/abi/TicketShop.json";
 
 let contract
 
-let contractAddress='0x8c096b239da3cbc48aacdd03cbe12c5d5079f833'
+// let contractAddress='0x8c096b239da3cbc48aacdd03cbe12c5d5079f833'
+let contractAddress='0x8441d93e5c8d59ad76c317845e140d95cff0666a'
 
 /**
  * 全局init(名称使用合约名命名)

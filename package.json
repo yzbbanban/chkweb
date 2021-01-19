@@ -18,6 +18,7 @@
     "js-conflux-sdk": "^1.0.2",
     "moment": "^2.29.1",
     "vue": "^2.5.2",
+    "vue-flip-down": "^1.0.7",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {

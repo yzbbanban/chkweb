@@ -8,7 +8,8 @@ let contract
  */
 export const initSnatchContract = async()=>{
     if(contract == null){
-        contract = await getContract('0x84d3f816dde2bc581c10ef5a65af79c6dc30ddff',Snatch);
+        //0x8e863dbde5e3c8598aaa9975315aebe2f5a57966
+        contract = await getContract('0x825d6cfff427ff50563bee2f460d20372cc5bcfe',Snatch);
         console.log(contract)
     }
 }
